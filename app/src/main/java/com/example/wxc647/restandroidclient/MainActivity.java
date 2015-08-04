@@ -2,8 +2,6 @@ package com.example.wxc647.restandroidclient;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -27,6 +25,8 @@ public class MainActivity extends Activity
     private List<User> usersCollection = new ArrayList<>();
     private HttpHelper httpHelper = new HttpHelper();
     private MiscUtil miscUtil = new MiscUtil();
+    private UserInterfaceUtil uiUtil = new UserInterfaceUtil();
+
     final String serverUrl = "http://10.110.64.78:8080/users";
 
 
@@ -88,24 +88,19 @@ public class MainActivity extends Activity
         // Set up the input
         final EditText input = new EditText(this);
         // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
         builder.setView(input);
 
         builder.setPositiveButton(R.string.dialog_message_ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id)
-            {
+            public void onClick(DialogInterface dialog, int id) {
                 String deletedUserId = input.getText().toString();
                 //execute delete request for the given user
-                new HttpDeleteRequestTask(deletedUserId).execute();
+                new HttpDeleteRequestTask(MainActivity.this, deletedUserId).execute();
             }
         });
 
-        builder.setNegativeButton(R.string.dialog_message_cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id)
-            {
-                // User cancelled the dialog
-            }
-        });
+        builder.setNegativeButton(R.string.dialog_message_cancel,null);
+
 
         // Create the AlertDialog
         AlertDialog dialog = builder.create();
@@ -122,10 +117,12 @@ public class MainActivity extends Activity
     private class HttpDeleteRequestTask extends AsyncTask<Void, Void,  Integer>
     {
         private String userId;
+        private Context mContext;
+        private UserInterfaceUtil uiUtil = new UserInterfaceUtil();
 
-
-        public HttpDeleteRequestTask(String userId)
+        public HttpDeleteRequestTask(Context context, String userId)
         {
+            this.mContext = context;
             this.userId = userId;
         }
 
@@ -152,6 +149,11 @@ public class MainActivity extends Activity
         @Override
         protected void onPostExecute(Integer responseCode)
         {
+            //The server has fulfilled the request but does not need to return an entity-body
+            if(responseCode == ResponseCodes.RESPONSE_CODE_204)
+            {
+                uiUtil.showAlert(this.mContext, "User has been successfully deleted", "RestApiClient");
+            }
         }
     }
 
@@ -187,12 +189,14 @@ public class MainActivity extends Activity
         @Override
         protected void onPostExecute(List<User> users)
         {
-            ListView usersListView = (ListView) findViewById(R.id.listView);
-            ArrayAdapter<User> adapter = new ArrayAdapter<>(this.mContext,
-                    android.R.layout.simple_list_item_1, users);
+            if(users != null && users.size() > 0)
+            {
+                ListView usersListView = (ListView) findViewById(R.id.listView);
+                ArrayAdapter<User> adapter = new ArrayAdapter<>(this.mContext,
+                        android.R.layout.simple_list_item_1, users);
 
-            usersListView.setAdapter(adapter);
-
+                usersListView.setAdapter(adapter);
+            }
         }
     }
 }
