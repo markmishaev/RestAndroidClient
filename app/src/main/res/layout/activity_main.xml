@@ -28,6 +28,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/btnDeleteUser"
                 android:text="Delete User"
+                android:onClick="deleteUser"
                 android:layout_column="0" />
         </TableRow>
         <TableRow
@@ -38,6 +39,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/btnUpdateUser"
                 android:text="Update User"
+                android:onClick="updateUser"
                 android:layout_column="0" />
         </TableRow>
     </TableLayout>

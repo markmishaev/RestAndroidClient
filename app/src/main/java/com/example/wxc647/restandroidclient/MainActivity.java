@@ -1,14 +1,21 @@
 package com.example.wxc647.restandroidclient;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import com.google.gson.Gson;
@@ -27,7 +34,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity
+{
+    List<User> usersCollection = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +64,67 @@ public class MainActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void updateUser(View view)
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Hello Mark, What would you like me to show?").setTitle("Just a title");
+
+        builder.setPositiveButton(R.string.dialog_message_ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked OK button
+            }
+        });
+
+        builder.setNegativeButton(R.string.dialog_message_cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+            }
+        });
+
+        // Create the AlertDialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+
+    public void deleteUser(View view)
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Please enter a user id as it stored in the users table:").setTitle("Delete user");
+        // Set up the input
+        final EditText input = new EditText(this);
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        builder.setView(input);
+
+        builder.setPositiveButton(R.string.dialog_message_ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id)
+            {
+                String deletedUserId = input.getText().toString();
+                int result = executeDeleteUserHttpCommand(deletedUserId);
+
+            }
+        });
+
+        builder.setNegativeButton(R.string.dialog_message_cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+            }
+        });
+
+        // Create the AlertDialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private int executeDeleteUserHttpCommand(String userId)
+    {
+        int result = -1;
+
+        return result;
+
     }
 
     @Override
@@ -88,7 +158,7 @@ public class MainActivity extends Activity {
             JsonParser jsonParser = new JsonParser();
             JsonArray users = (JsonArray) jsonParser.parse(usersCollectionResponse);
 
-            List<User> usersCollection = new ArrayList<>();
+            usersCollection.clear();
             for (int i=0; i < users.size(); i++)
             {
                 User user = gson.fromJson(users.get(i), User.class);
@@ -112,7 +182,8 @@ public class MainActivity extends Activity {
         return null;
     }
 
-    private class HttpRequestTask extends AsyncTask<Void, Void,  List<User>>
+
+       private class HttpRequestTask extends AsyncTask<Void, Void,  List<User>>
     {
         private Context mContext;
 
@@ -131,7 +202,7 @@ public class MainActivity extends Activity {
         {
             try
             {
-                final String url = "http://192.168.1.56:8080/users";
+                final String url = "http://10.110.64.78:8080/users";
                 return getUsersList(url);
             }
             catch (Exception e)

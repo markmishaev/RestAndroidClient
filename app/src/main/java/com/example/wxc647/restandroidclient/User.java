@@ -3,6 +3,8 @@ package com.example.wxc647.restandroidclient;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonRootName;
 
+import java.util.List;
+
 /**
  * Created by wxc647 on 8/2/2015.
  */
@@ -11,8 +13,63 @@ import com.fasterxml.jackson.annotation.JsonRootName;
 @JsonRootName(value = "user")
 public class User
 {
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonRootName(value = "self")
+    public class Self
+    {
+        private String href;
 
-     private String firstName;
+        public Self()
+        {
+
+        }
+
+        public Self(String href)
+        {
+            this.href = href;
+        }
+
+        public String getHref()
+        {
+            return href;
+        }
+
+        public void setHref(String href)
+        {
+            this.href = href;
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonRootName(value = "_links")
+    public class Link
+    {
+        private Self self;
+
+        public Link()
+        {
+
+        }
+
+        public Link(Self self)
+        {
+            this.self = self;
+        }
+
+        public Self getSelf()
+        {
+            return self;
+        }
+
+        public void setSelf(Self self)
+        {
+            this.self = self;
+        }
+    }
+
+    private List<Link> _links;
+
+    private String firstName;
 
 
     private String lastName;
@@ -36,6 +93,23 @@ public class User
         this(firstNameParam,lastNameParam);
         this.isActive = isActiveParam;
     }
+
+    public User(String firstNameParam, String lastNameParam, boolean isActiveParam, List<Link> _links)
+    {
+        this(firstNameParam, lastNameParam, isActiveParam);
+        this._links = _links;
+    }
+
+    public List<Link> get_Links()
+    {
+        return _links;
+    }
+
+    public void set_Links(List<Link> links)
+    {
+        this._links = links;
+    }
+
 
     public String getFirstName()
     {
