@@ -59,6 +59,37 @@ public class MainActivity extends Activity
         return super.onOptionsItemSelected(item);
     }
 
+    public void addUser(View view)
+    {
+        // get prompts.xml view
+        LayoutInflater li = LayoutInflater.from(this);
+        View addUserPrompt = li.inflate(R.layout.add_user_prompt, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(addUserPrompt);
+
+        final EditText addInputFirstNameEditText = (EditText) addUserPrompt.findViewById(R.id.editTextDialogUserFirstName);
+        final EditText addInputLastNameEditText = (EditText) addUserPrompt.findViewById(R.id.editTextDialogUserLastName);
+
+        builder.setPositiveButton(R.string.dialog_message_ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id)
+            {
+                String addedUserFirstName = addInputFirstNameEditText.getText().toString();
+                String addedUserLastName = addInputLastNameEditText.getText().toString();
+
+                //execute update request for the given user
+                new HttpAddRequestTask(MainActivity.this, addedUserFirstName, addedUserLastName).execute();
+
+            }
+        });
+
+        builder.setNegativeButton(R.string.dialog_message_cancel, null);
+
+        // Create the AlertDialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
     public void updateUser(View view)
     {
         // get prompts.xml view
@@ -127,6 +158,55 @@ public class MainActivity extends Activity
 
 /**************************************HttpRequest Async Tasks Classes*****************************************************************************************************/
 
+    private class HttpAddRequestTask extends AsyncTask<Void, Void,  Integer>
+    {
+        private String userId;
+        private String userFirstName;
+        private String userLastName;
+        private Context mContext;
+        private UserInterfaceUtil uiUtil = new UserInterfaceUtil();
+
+        public HttpAddRequestTask(Context context, String userFirstName, String userLastName)
+        {
+            this.mContext = context;
+            this.userFirstName = userFirstName;
+            this.userLastName = userLastName;
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+        }
+
+        @Override
+        protected  Integer doInBackground(Void... params)
+        {
+            try
+            {
+                return httpHelper.addUserRequest(serverUrl, userFirstName, userLastName);
+            }
+            catch (Exception e)
+            {
+                Log.e("MainActivity", e.getMessage(), e);
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Integer responseCode)
+        {
+            //The server has fulfilled the request but does not need to return an entity-body
+            if(responseCode == ResponseCodes.RESPONSE_CODE_201)
+            {
+                uiUtil.showAlert(this.mContext, "User has been successfully added", "RestApiClient");
+                //refresh users list
+                new HttpRequestTask(this.mContext).execute();
+            }
+        }
+    }
+
+
     private class HttpUpdateRequestTask extends AsyncTask<Void, Void,  Integer>
     {
         private String userId;
@@ -170,6 +250,8 @@ public class MainActivity extends Activity
             if(responseCode == ResponseCodes.RESPONSE_CODE_204)
             {
                 uiUtil.showAlert(this.mContext, "User has been successfully updated", "RestApiClient");
+                //refresh users list
+                new HttpRequestTask(this.mContext).execute();
             }
         }
     }
@@ -213,6 +295,8 @@ public class MainActivity extends Activity
             if(responseCode == ResponseCodes.RESPONSE_CODE_204)
             {
                 uiUtil.showAlert(this.mContext, "User has been successfully deleted", "RestApiClient");
+                //refresh users list
+                new HttpRequestTask(this.mContext).execute();
             }
         }
     }

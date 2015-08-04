@@ -92,6 +92,47 @@ public class HttpHelper
         return -1;
     }
 
+    public int addUserRequest(String serverUrl, String firstName, String lastName)
+    {
+        HttpURLConnection conn = null;
+
+        try
+        {
+            URL url = new URL(serverUrl);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+            conn.setRequestProperty("Accept", "application/json");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestMethod("POST");
+
+            JSONObject user = new JSONObject();
+            user.put("firstName", firstName);
+            user.put("lastName", lastName);
+
+            OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+            wr.write(user.toString());
+            wr.flush();
+            wr.close();
+
+            int responseCode = conn.getResponseCode();
+            return responseCode;
+        }
+        catch (Exception e)
+        {
+            Log.e("MainActivity", e.getMessage(), e);
+        }
+        finally
+        {
+            if(conn != null)
+            {
+                conn.disconnect();
+            }
+        }
+
+        return -1;
+    }
+
 
     public List<User> getUsersList(String urlParam, List<User> usersCollection)
     {

@@ -5,5 +5,6 @@ package com.example.wxc647.restandroidclient;
  */
 public class ResponseCodes
 {
-    final static Integer RESPONSE_CODE_204 = 204;
+    final static int RESPONSE_CODE_204 = 204;
+    final static int RESPONSE_CODE_201 = 201;
 }
