@@ -8,54 +8,22 @@ import android.view.MenuItem;
 
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.GridView;
 import android.widget.ListView;
-import android.widget.TextView;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
-
-//import org.springframework.http.MediaType;
-//import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-//import org.springframework.web.client.RestTemplate;
 
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 
@@ -120,10 +88,10 @@ public class MainActivity extends Activity {
             JsonParser jsonParser = new JsonParser();
             JsonArray users = (JsonArray) jsonParser.parse(usersCollectionResponse);
 
-            List<User> usersCollection = new ArrayList<User>();
+            List<User> usersCollection = new ArrayList<>();
             for (int i=0; i < users.size(); i++)
             {
-                User user = gson.fromJson((JsonElement)users.get(i), User.class);
+                User user = gson.fromJson(users.get(i), User.class);
                 usersCollection.add(user);
             }
 
@@ -178,7 +146,7 @@ public class MainActivity extends Activity {
         protected void onPostExecute(List<User> users)
         {
             ListView usersListView = (ListView) findViewById(R.id.listView);
-            ArrayAdapter<User> adapter = new ArrayAdapter<User>(this.mContext,
+            ArrayAdapter<User> adapter = new ArrayAdapter<>(this.mContext,
                     android.R.layout.simple_list_item_1, users);
 
             usersListView.setAdapter(adapter);
