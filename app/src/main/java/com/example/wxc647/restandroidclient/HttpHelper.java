@@ -66,8 +66,8 @@ public class HttpHelper
             conn.setRequestMethod("PATCH");
 
             JSONObject user = new JSONObject();
-            user.put("FirstName",firstName);
-            user.put("LastName", lastName);
+            user.put("firstName",firstName);
+            user.put("lastName", lastName);
 
             OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
             wr.write(user.toString());

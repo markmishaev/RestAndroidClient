@@ -169,7 +169,7 @@ public class MainActivity extends Activity
             //The server has fulfilled the request but does not need to return an entity-body
             if(responseCode == ResponseCodes.RESPONSE_CODE_204)
             {
-                uiUtil.showAlert(this.mContext, "User has been successfully deleted", "RestApiClient");
+                uiUtil.showAlert(this.mContext, "User has been successfully updated", "RestApiClient");
             }
         }
     }
