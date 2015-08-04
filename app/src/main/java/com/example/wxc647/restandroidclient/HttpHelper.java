@@ -6,8 +6,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 
+import org.json.JSONObject;
+
 import java.io.BufferedInputStream;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
@@ -47,6 +50,48 @@ public class HttpHelper
 
         return -1;
     }
+
+    public int updateUserRequest(String userUri, String firstName, String lastName)
+    {
+        HttpURLConnection conn = null;
+
+        try
+        {
+            URL url = new URL(userUri);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+            conn.setRequestProperty("Accept", "application/json");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestMethod("PATCH");
+
+            JSONObject user = new JSONObject();
+            user.put("FirstName",firstName);
+            user.put("LastName", lastName);
+
+            OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+            wr.write(user.toString());
+            wr.flush();
+            wr.close();
+
+            int responseCode = conn.getResponseCode();
+            return responseCode;
+        }
+        catch (Exception e)
+        {
+            Log.e("MainActivity", e.getMessage(), e);
+        }
+        finally
+        {
+            if(conn != null)
+            {
+                conn.disconnect();
+            }
+        }
+
+        return -1;
+    }
+
 
     public List<User> getUsersList(String urlParam, List<User> usersCollection)
     {

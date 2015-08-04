@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.InputType;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -60,20 +61,31 @@ public class MainActivity extends Activity
 
     public void updateUser(View view)
     {
+        // get prompts.xml view
+        LayoutInflater li = LayoutInflater.from(this);
+        View updateUserPrompt = li.inflate(R.layout.update_user_prompt, null);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Hello Mark, What would you like me to show?").setTitle("Just a title");
+        builder.setView(updateUserPrompt);
+
+        final EditText userInputIdEditText= (EditText) updateUserPrompt.findViewById(R.id.editTextDialogUserId);
+        final EditText userInputFirstNameEditText = (EditText) updateUserPrompt.findViewById(R.id.editTextDialogUserFirstName);
+        final EditText userInputLastNameEditText = (EditText) updateUserPrompt.findViewById(R.id.editTextDialogUserLastName);
 
         builder.setPositiveButton(R.string.dialog_message_ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                // User clicked OK button
+            public void onClick(DialogInterface dialog, int id)
+            {
+                String updatedUserId = userInputIdEditText.getText().toString();
+                String updatedUserFirstName = userInputFirstNameEditText.getText().toString();
+                String updatedUserLastName = userInputLastNameEditText.getText().toString();
+
+                //execute update request for the given user
+                new HttpUpdateRequestTask(MainActivity.this, updatedUserId,updatedUserFirstName, updatedUserLastName).execute();
+
             }
         });
 
-        builder.setNegativeButton(R.string.dialog_message_cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                // User cancelled the dialog
-            }
-        });
+        builder.setNegativeButton(R.string.dialog_message_cancel, null);
 
         // Create the AlertDialog
         AlertDialog dialog = builder.create();
@@ -114,6 +126,54 @@ public class MainActivity extends Activity
     }
 
 /**************************************HttpRequest Async Tasks Classes*****************************************************************************************************/
+
+    private class HttpUpdateRequestTask extends AsyncTask<Void, Void,  Integer>
+    {
+        private String userId;
+        private String userFirstName;
+        private String userLastName;
+        private Context mContext;
+        private UserInterfaceUtil uiUtil = new UserInterfaceUtil();
+
+        public HttpUpdateRequestTask(Context context, String userId, String userFirstName, String userLastName)
+        {
+            this.mContext = context;
+            this.userId = userId;
+            this.userFirstName = userFirstName;
+            this.userLastName = userLastName;
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+        }
+
+        @Override
+        protected  Integer doInBackground(Void... params)
+        {
+            try
+            {
+                return httpHelper.updateUserRequest(miscUtil.getUserUri(userId, usersCollection), userFirstName,userLastName);
+            }
+            catch (Exception e)
+            {
+                Log.e("MainActivity", e.getMessage(), e);
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Integer responseCode)
+        {
+            //The server has fulfilled the request but does not need to return an entity-body
+            if(responseCode == ResponseCodes.RESPONSE_CODE_204)
+            {
+                uiUtil.showAlert(this.mContext, "User has been successfully deleted", "RestApiClient");
+            }
+        }
+    }
+
     private class HttpDeleteRequestTask extends AsyncTask<Void, Void,  Integer>
     {
         private String userId;

@@ -16,6 +16,8 @@ public class UserInterfaceUtil
         builder1.setTitle(title);
         builder1.setMessage(message);
         builder1.setCancelable(true);
+        builder1.setPositiveButton(R.string.dialog_message_ok, null);
+
 
         AlertDialog alert11 = builder1.create();
         alert11.show();
