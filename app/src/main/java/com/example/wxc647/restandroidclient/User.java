@@ -67,7 +67,7 @@ public class User
         }
     }
 
-    private List<Link> _links;
+    private Link _links;
 
     private String firstName;
 
@@ -94,18 +94,18 @@ public class User
         this.isActive = isActiveParam;
     }
 
-    public User(String firstNameParam, String lastNameParam, boolean isActiveParam, List<Link> _links)
+    public User(String firstNameParam, String lastNameParam, boolean isActiveParam, Link _links)
     {
         this(firstNameParam, lastNameParam, isActiveParam);
         this._links = _links;
     }
 
-    public List<Link> get_Links()
+    public Link get_Links()
     {
         return _links;
     }
 
-    public void set_Links(List<Link> links)
+    public void set_Links(Link links)
     {
         this._links = links;
     }
